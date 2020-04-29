@@ -7,10 +7,23 @@ import styles from './styles';
 import AppBar from './components/AppBar';
 import LCD from './components/LCD';
 import LEDs from './components/LEDs';
+import * as actions from './actions';
+import * as state from './state';
 
 const App = withStyles(styles)(({ classes }: WithStyles<typeof styles>) => {
   const [LCDHasFocus, setLCDHasFocus] = useState(false);
   const LCDElement = useRef<HTMLDivElement>(null);
+
+  const [connectionStatus, setConnectionStatus] = useState(state.connection$.value.status);
+  const [deviceName, setDeviceName] = useState<string | undefined>(state.connection$.value.deviceName);
+
+  useEffect(() => {
+    const subscription = state.connection$.subscribe(connection => {
+      setConnectionStatus(connection.status);
+      setDeviceName(connection.deviceName);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     window.addEventListener('click', (event) => {
@@ -33,7 +46,7 @@ const App = withStyles(styles)(({ classes }: WithStyles<typeof styles>) => {
 
   return (
     <Container maxWidth="md" className={classes.root}>
-      <AppBar />
+      <AppBar deviceName={deviceName} connectionStatus={connectionStatus} onConnectClick={actions.connect} />
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <LCD hasFocus={LCDHasFocus} ref={LCDElement} />
