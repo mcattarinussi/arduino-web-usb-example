@@ -50,7 +50,11 @@ const App = withStyles(styles)(({ classes }: WithStyles<typeof styles>) => {
       <AppBar deviceName={deviceName} connectionStatus={connectionStatus} onConnectClick={actions.connect} />
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          <LCD hasFocus={LCDHasFocus} ref={LCDElement} />
+          <LCD
+            hasFocus={LCDHasFocus}
+            onNewCharacter={actions.setLCDChar}
+            ref={LCDElement}
+          />
         </Grid>
         <Grid item xs={6}>
           <LEDs

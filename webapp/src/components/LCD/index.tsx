@@ -72,9 +72,13 @@ const DisplayRow = withStyles(styles)(({ classes, hasFocus, text }: { hasFocus: 
     );
 });
 
+interface Props {
+    hasFocus: boolean
+    onNewCharacter: (char: string) => void;
+}
 
 export default withStyles(styles)(
-    React.forwardRef<HTMLDivElement, { hasFocus: boolean } & WithStyles<typeof styles>>(({ classes, hasFocus }, ref) => {
+    React.forwardRef<HTMLDivElement, WithStyles<typeof styles> & Props>(({ classes, hasFocus, onNewCharacter }, ref) => {
         const [text, setText] = useState('');
 
         useEffect(() => {
@@ -85,14 +89,16 @@ export default withStyles(styles)(
             const updateRows = (char: string) => {
                 if (char === 'Backspace') {
                     setText(r => r.slice(0, -1));
+                    onNewCharacter('\b');
                 } else {
                     setText(r => r.length < 32 ? r + char : r);
+                    onNewCharacter(char);
                 }
             }
 
             const keysSubscription = keys$.subscribe(updateRows)
 
-            return keysSubscription.unsubscribe.bind(keysSubscription);
+            return () => keysSubscription.unsubscribe();
         }, [hasFocus]);
 
         return (
@@ -104,5 +110,4 @@ export default withStyles(styles)(
                 </div>
             </Paper>
         );
-    }
-    ));
+    }));
