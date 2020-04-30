@@ -16,12 +16,6 @@ typedef struct
     char payload[COMMAND_PAYLOAD_SIZE];
 } Command;
 
-// typedef struct
-// {
-//     int col;
-//     int row;
-// } LCDLastChar;
-
 WebUSB WebUSBSerial(1 /* https:// */, "webusb.github.io/arduino/demos");
 LiquidCrystal lcd(A5, A4, A3, A2, A1, A0);
 
@@ -44,39 +38,12 @@ void loop()
         switch (command.type)
         {
         case '1':
-            analogWrite(RED_LED_PIN, atoi(command.payload));
-            break;
         case '2':
-            analogWrite(YELLOW_LED_PIN, atoi(command.payload));
-            break;
         case '3':
-            analogWrite(GREEN_LED_PIN, atoi(command.payload));
+            handleLedValue(command.type, atoi(command.payload));
             break;
         case '4':
-            if (command.payload[0] == '\b')
-            {
-                if (lcdLastCharPosition == -1)
-                {
-                    return;
-                }
-
-                lcd.setCursor(lcdLastCharPosition % 16, lcdLastCharPosition < 16 ? 0 : 1);
-                lcd.print(" ");
-                lcdLastCharPosition--;
-
-                return;
-            }
-
-            if (lcdLastCharPosition == 31)
-            {
-                return;
-            }
-
-            lcdLastCharPosition++;
-
-            lcd.setCursor(lcdLastCharPosition % 16, lcdLastCharPosition < 16 ? 0 : 1);
-            lcd.print(command.payload[0]);
-
+            handleLCDChar(command.payload[0]);
             break;
         default:
             Serial.write("Unknown command");
@@ -120,4 +87,37 @@ Command readCommand()
     }
 
     return command;
+}
+
+void handleLedValue(char commandType, int value)
+{
+    int pinNumber = commandType == '1' ? RED_LED_PIN : (commandType == '2' ? YELLOW_LED_PIN : GREEN_LED_PIN);
+    analogWrite(pinNumber, value);
+}
+
+void handleLCDChar(char inputChar)
+{
+    if (inputChar == '\b')
+    {
+        if (lcdLastCharPosition == -1)
+        {
+            return;
+        }
+
+        lcd.setCursor(lcdLastCharPosition % 16, lcdLastCharPosition < 16 ? 0 : 1);
+        lcd.print(" ");
+        lcdLastCharPosition--;
+
+        return;
+    }
+
+    if (lcdLastCharPosition == 31)
+    {
+        return;
+    }
+
+    lcdLastCharPosition++;
+
+    lcd.setCursor(lcdLastCharPosition % 16, lcdLastCharPosition < 16 ? 0 : 1);
+    lcd.print(inputChar);
 }
