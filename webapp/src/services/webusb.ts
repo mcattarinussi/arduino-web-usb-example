@@ -1,5 +1,7 @@
 import { SUPPORTED_DEVICES } from '../conifg';
 
+const textEncoder = new TextEncoder();
+
 const selectInterface = async (device: USBDevice): Promise<{ endpoints: USBEndpoint[], interfaceNumber: number }> => {
     const [interfaceConfig] = device.configuration!.interfaces
         .map(
@@ -69,6 +71,6 @@ export const initializeDevice = async (device: USBDevice): Promise<{ endpointInN
     return { endpointInNumber, endpointOutNumber };
 };
 
-// export const send = (device, endpointNumber, data) => {
-//     // TODO
-// }
+export const send = async (device: USBDevice, endpointNumber: number, data: string): Promise<void> => {
+    await device.transferOut(endpointNumber, textEncoder.encode(data));
+}
