@@ -53,7 +53,11 @@ const App = withStyles(styles)(({ classes }: WithStyles<typeof styles>) => {
           <LCD hasFocus={LCDHasFocus} ref={LCDElement} />
         </Grid>
         <Grid item xs={6}>
-          <LEDs />
+          <LEDs
+            onRedLedValueChange={actions.setRedLEDValue}
+            onYellowLedValueChange={actions.setYellowLEDValue}
+            onGreenLedValueChange={actions.setGreenLEDValue}
+          />
         </Grid>
       </Grid>
     </Container>
