@@ -1,7 +1,5 @@
-// Third-party WebUSB Arduino library
+#include <LiquidCrystal.h>
 #include <WebUSB.h>
-
-WebUSB WebUSBSerial(1 /* https:// */, "webusb.github.io/arduino/demos");
 
 #define Serial WebUSBSerial
 
@@ -10,6 +8,7 @@ WebUSB WebUSBSerial(1 /* https:// */, "webusb.github.io/arduino/demos");
 #define GREEN_LED_PIN 11
 
 #define COMMAND_PAYLOAD_SIZE 3
+#define LCD_CONTRAST 50
 
 typedef struct
 {
@@ -17,18 +16,23 @@ typedef struct
     char payload[COMMAND_PAYLOAD_SIZE];
 } Command;
 
-int idx = 0;
+// typedef struct
+// {
+//     int col;
+//     int row;
+// } LCDLastChar;
+
+WebUSB WebUSBSerial(1 /* https:// */, "webusb.github.io/arduino/demos");
+LiquidCrystal lcd(A5, A4, A3, A2, A1, A0);
+
+int lcdLastCharPosition = -1;
 
 void setup()
 {
-    Serial.begin(9600);
-
-    while (!Serial)
-    {
-        ; // Wait for serial port to connect.
-    }
-
     pinMode(RED_LED_PIN, OUTPUT);
+
+    setupLCD();
+    setupSerial();
 }
 
 void loop()
@@ -48,12 +52,54 @@ void loop()
         case '3':
             analogWrite(GREEN_LED_PIN, atoi(command.payload));
             break;
+        case '4':
+            if (command.payload[0] == '\b')
+            {
+                if (lcdLastCharPosition == -1)
+                {
+                    return;
+                }
+
+                lcd.setCursor(lcdLastCharPosition % 16, lcdLastCharPosition < 16 ? 0 : 1);
+                lcd.print(" ");
+                lcdLastCharPosition--;
+
+                return;
+            }
+
+            if (lcdLastCharPosition == 31)
+            {
+                return;
+            }
+
+            lcdLastCharPosition++;
+
+            lcd.setCursor(lcdLastCharPosition % 16, lcdLastCharPosition < 16 ? 0 : 1);
+            lcd.print(command.payload[0]);
+
+            break;
         default:
             Serial.write("Unknown command");
         }
 
         Serial.flush();
     }
+}
+
+void setupSerial()
+{
+    Serial.begin(9600);
+    while (!Serial)
+    {
+        ; // Wait for serial port to connect.
+    }
+}
+
+void setupLCD()
+{
+    lcd.begin(16, 2);
+    lcd.setCursor(0, 0);
+    analogWrite(3, LCD_CONTRAST);
 }
 
 Command readCommand()
