@@ -8,20 +8,21 @@ import AppBar from './components/AppBar';
 import LCD from './components/LCD';
 import LEDs from './components/LEDs';
 import * as actions from './actions';
-import * as state from './state';
+import state from './state';
 
 const App = withStyles(styles)(({ classes }: WithStyles<typeof styles>) => {
   const [LCDHasFocus, setLCDHasFocus] = useState(false);
   const LCDElement = useRef<HTMLDivElement>(null);
 
-  const [connectionStatus, setConnectionStatus] = useState(state.connection$.value.status);
-  const [deviceName, setDeviceName] = useState<string | undefined>(state.connection$.value.deviceName);
+  const [connectionStatus, setConnectionStatus] = useState(state.value.status);
+  const [deviceName, setDeviceName] = useState(state.value.connection ? state.value.connection.device.productName : undefined);
 
   useEffect(() => {
-    const subscription = state.connection$.subscribe(connection => {
-      setConnectionStatus(connection.status);
-      setDeviceName(connection.deviceName);
+    const subscription = state.subscribe(s => {
+      setConnectionStatus(s.status);
+      setDeviceName(state.value.connection ? state.value.connection.device.productName : undefined);
     });
+
     return () => subscription.unsubscribe();
   }, []);
 

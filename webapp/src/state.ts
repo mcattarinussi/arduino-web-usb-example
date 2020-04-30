@@ -1,6 +1,12 @@
 import { BehaviorSubject } from 'rxjs'
 
-export const connection$ = new BehaviorSubject<{ deviceName?: string, status: 'NOT_CONNECTED' | 'CONNECTED' }>({
-    deviceName: undefined,
+interface USBConnection {
+    device: USBDevice,
+    endpointInNumber: number;
+    endpointOutNumber: number;
+}
+
+export default new BehaviorSubject<{ connection?: USBConnection, status: 'NOT_CONNECTED' | 'CONNECTED' }>({
+    connection: undefined,
     status: 'NOT_CONNECTED'
 });
