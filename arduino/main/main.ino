@@ -5,6 +5,10 @@ WebUSB WebUSBSerial(1 /* https:// */, "webusb.github.io/arduino/demos");
 
 #define Serial WebUSBSerial
 
+#define RED_LED_PIN 9
+#define YELLOW_LED_PIN 10
+#define GREEN_LED_PIN 11
+
 #define COMMAND_PAYLOAD_SIZE 3
 
 typedef struct
@@ -23,6 +27,8 @@ void setup()
     {
         ; // Wait for serial port to connect.
     }
+
+    pinMode(RED_LED_PIN, OUTPUT);
 }
 
 void loop()
@@ -31,11 +37,19 @@ void loop()
     {
         Command command = readCommand();
 
-        Serial.write(command.type);
-        Serial.write(':');
-        for (int i = 0; i < COMMAND_PAYLOAD_SIZE; i++)
+        switch (command.type)
         {
-            Serial.write(command.payload[i]);
+        case '1':
+            analogWrite(RED_LED_PIN, atoi(command.payload));
+            break;
+        case '2':
+            analogWrite(YELLOW_LED_PIN, atoi(command.payload));
+            break;
+        case '3':
+            analogWrite(GREEN_LED_PIN, atoi(command.payload));
+            break;
+        default:
+            Serial.write("Unknown command");
         }
 
         Serial.flush();
