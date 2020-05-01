@@ -99,7 +99,7 @@ export default withStyles(styles)(
             const keysSubscription = keys$.subscribe(updateRows)
 
             return () => keysSubscription.unsubscribe();
-        }, [hasFocus]);
+        }, [hasFocus, onNewCharacter]);
 
         return (
             <Paper className={classes.paper}>

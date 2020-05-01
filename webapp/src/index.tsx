@@ -18,16 +18,12 @@ const App = withStyles(styles)(({ classes }: WithStyles<typeof styles>) => {
   const [deviceName, setDeviceName] = useState(state.value.connection ? state.value.connection.device.productName : undefined);
 
   useEffect(() => {
-    const subscription = state.subscribe(s => {
+    const keysSubscription = state.subscribe(s => {
       setConnectionStatus(s.status);
       setDeviceName(state.value.connection ? state.value.connection.device.productName : undefined);
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener('click', (event) => {
+    const updateLCDHasFocus = (event: MouseEvent) => {
       if (!LCDElement.current) {
         return;
       }
@@ -42,12 +38,21 @@ const App = withStyles(styles)(({ classes }: WithStyles<typeof styles>) => {
       } else {
         setLCDHasFocus(false);
       }
-    })
-  });
+    };
+
+    window.addEventListener('click', updateLCDHasFocus);
+
+    actions.connectPairedDevice();
+
+    return () => {
+      window.removeEventListener('click', updateLCDHasFocus);
+      keysSubscription.unsubscribe();
+    }
+  }, []);
 
   return (
     <Container maxWidth="md" className={classes.root}>
-      <AppBar deviceName={deviceName} connectionStatus={connectionStatus} onConnectClick={actions.connect} />
+      <AppBar deviceName={deviceName} connectionStatus={connectionStatus} onConnectClick={actions.connectNewDevice} />
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <LCD

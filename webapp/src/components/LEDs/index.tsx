@@ -17,7 +17,7 @@ const LEDWithSlider = withStyles(styles)(
 
     useEffect(() => {
         onValueChange(brightness);
-    }, [brightness]);
+    }, [brightness, onValueChange]);
 
     const ledStyle = {
         backgroundColor: color,
