@@ -17,12 +17,22 @@ const App = withStyles(styles)(({ classes }: WithStyles<typeof styles>) => {
   const [connectionStatus, setConnectionStatus] = useState(state.value.status);
   const [deviceName, setDeviceName] = useState(state.value.connection ? state.value.connection.device.productName : undefined);
 
+  const [containerStyle, setContainerStyle] = useState<{ opacity: number, pointerEvents: 'auto' | 'none' }>(
+    { pointerEvents: 'none', opacity: 0.3 }
+  );
+
   useEffect(() => {
-    const keysSubscription = state.subscribe(s => {
+    const stateSubscription = state.subscribe(s => {
       setConnectionStatus(s.status);
       setDeviceName(state.value.connection ? state.value.connection.device.productName : undefined);
     });
 
+    actions.connectPairedDevice();
+
+    return () => stateSubscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
     const updateLCDHasFocus = (event: MouseEvent) => {
       if (!LCDElement.current) {
         return;
@@ -40,20 +50,26 @@ const App = withStyles(styles)(({ classes }: WithStyles<typeof styles>) => {
       }
     };
 
-    window.addEventListener('click', updateLCDHasFocus);
-
-    actions.connectPairedDevice();
-
-    return () => {
+    const disableComponents = () => {
+      setContainerStyle({ pointerEvents: 'none', opacity: 0.3 });
       window.removeEventListener('click', updateLCDHasFocus);
-      keysSubscription.unsubscribe();
     }
-  }, []);
+
+    if (connectionStatus === 'NOT_CONNECTED') {
+      disableComponents();
+      return;
+    }
+
+    window.addEventListener('click', updateLCDHasFocus);
+    setContainerStyle({ pointerEvents: 'auto' as 'auto', opacity: 1 });
+
+    return disableComponents;
+  }, [connectionStatus]);
 
   return (
     <Container maxWidth="md" className={classes.root}>
       <AppBar deviceName={deviceName} connectionStatus={connectionStatus} onConnectClick={actions.connectNewDevice} />
-      <Grid container spacing={1}>
+      <Grid container spacing={1} style={containerStyle}>
         <Grid item xs={12}>
           <LCD
             hasFocus={LCDHasFocus}
