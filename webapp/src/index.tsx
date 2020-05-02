@@ -84,7 +84,7 @@ const App = withStyles(styles)(({ classes }: WithStyles<typeof styles>) => {
             />
           </Grid>
           <Grid item xs={6}>
-            <Servo></Servo>
+            <Servo onRotate={actions.setServoPosition}></Servo>
           </Grid>
         </Grid>
       </Grid>

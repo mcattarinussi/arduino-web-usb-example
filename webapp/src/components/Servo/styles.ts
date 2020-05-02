@@ -28,6 +28,7 @@ export default createStyles({
         width: 95
     },
     hornContainer: {
+        cursor: 'grab',
         height: 250,
         left: 25,
         position: 'absolute',
