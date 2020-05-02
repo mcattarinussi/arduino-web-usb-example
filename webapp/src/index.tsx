@@ -4,9 +4,7 @@ import { Container, Grid } from '@material-ui/core';
 import ReactDOM from 'react-dom';
 
 import styles from './styles';
-import AppBar from './components/AppBar';
-import LCD from './components/LCD';
-import LEDs from './components/LEDs';
+import { AppBar, LCD, LEDs, Servo } from './components';
 import * as actions from './actions';
 import state from './state';
 
@@ -77,12 +75,17 @@ const App = withStyles(styles)(({ classes }: WithStyles<typeof styles>) => {
             ref={LCDElement}
           />
         </Grid>
-        <Grid item xs={6}>
-          <LEDs
-            onRedLedValueChange={actions.setRedLEDValue}
-            onYellowLedValueChange={actions.setYellowLEDValue}
-            onGreenLedValueChange={actions.setGreenLEDValue}
-          />
+        <Grid container item spacing={1}>
+          <Grid item xs={6}>
+            <LEDs
+              onRedLedValueChange={actions.setRedLEDValue}
+              onYellowLedValueChange={actions.setYellowLEDValue}
+              onGreenLedValueChange={actions.setGreenLEDValue}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Servo></Servo>
+          </Grid>
         </Grid>
       </Grid>
     </Container>
