@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/arduino-web-usb-example/precache-manifest.f5d4d8f6433fe4e13cf99719b0f4e2e6.js"
+  "/arduino-web-usb-example/precache-manifest.af4a937f519d5a31d5ad661ef97eb88c.js"
 );
 
 self.addEventListener('message', (event) => {
